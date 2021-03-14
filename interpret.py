@@ -1,13 +1,16 @@
 from argControll import Arguments
+from xmlParse import XMLParser
+import os
 
 def main():
     # kontrola parametrov programu
     argChecker = Arguments()
     argChecker.argCheck()
-    if(argChecker.inputFlag):
-        print(argChecker.input)
-    else:
-        print("source je stdin")
+
+    # xml parsing
+    xmlParsing = XMLParser(argChecker.sourceFlag, argChecker.source)
+    
+    
 
 if __name__ == "__main__":
     main()
