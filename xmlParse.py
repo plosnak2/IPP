@@ -10,7 +10,6 @@ class XMLParser:
         else:
             self.source = sys.stdin
 
-        self.xmlStruct()
     
     def xmlStruct(self):
         """Funkcia na kontrolu zakladnej struktury XML"""

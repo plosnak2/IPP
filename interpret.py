@@ -9,6 +9,8 @@ def main():
 
     # xml parsing
     xmlParsing = XMLParser(argChecker.sourceFlag, argChecker.source)
+    xmlParsing.xmlStruct()
+
     
     
 
