@@ -9,10 +9,9 @@ def main():
 
     # xml parsing
     xmlParsing = XMLParser(argChecker.sourceFlag, argChecker.source)
-    xmlParsing.xmlStruct()
-
+    xmlParsing.xmlParse()
+    print("OK")
     
     
-
 if __name__ == "__main__":
     main()
