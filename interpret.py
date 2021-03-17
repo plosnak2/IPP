@@ -19,6 +19,7 @@ def main():
 
     # v zozname je aspon jedna instrukcia -> ideme v cykle
     variable = Variables()
+    stack = Stack()
     actualInstruction = 1
     while True:
         instruction = instructions.getNextInstr(actualInstruction)
@@ -26,8 +27,21 @@ def main():
             break
         if(instruction.opcode == 'DEFVAR'):
             variable.defvar(instruction.arg1)
-        elif(instruction.opcode == 'PRINT'):
-            pass
+        elif(instruction.opcode == 'WRITE'):
+            arg_type, arg_value = variable.getTypeAndValue(instruction.arg1)
+            if(arg_value is None):
+                sys.stderr.write("Pokus o vypis obsahu premennej bez hodnoty: {}\n".format(instruction.arg1.text))
+                sys.exit(56)
+            elif(arg_type == 'nil'):
+                print('')
+            else:
+                print(arg_value)
+        elif(instruction.opcode == 'PUSHS'):
+            arg_type, arg_value = variable.getTypeAndValue(instruction.arg1)
+            stack.pushStack(arg_type,arg_value)
+        elif(instruction.opcode == 'POPS'):
+            arg_type, arg_value = stack.popStack()
+            variable.setTypeAndValue(instruction.arg1, arg_type, arg_value)
         
         actualInstruction += 1
         

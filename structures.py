@@ -43,6 +43,28 @@ class Variables:
                 variable = Var()
                 self.globalFrame[name] = variable
 
+    def getTypeAndValue(self, arg):
+        if(arg.attrib['type'] == 'var'):
+            frame, name = arg.text.split('@', 1)
+            if(frame == 'GF'):
+                if name not in self.globalFrame:
+                    sys.stderr.write("Pristup k neexistujucej premennej: {}\n".format(name))
+                    sys.exit(52)
+                else:
+                    return(self.globalFrame[name].type, self.globalFrame[name].value)
+        else:
+            return(arg.attrib['type'], arg.text)
+
+    def setTypeAndValue(self, var, typ, value):
+        frame, name = var.text.split('@', 1)
+        if(frame == 'GF'):
+            if name not in self.globalFrame:
+                sys.stderr.write("Pristup k neexistujucej premennej: {}\n".format(name))
+                sys.exit(52)
+            else:
+                self.globalFrame[name].type = typ
+                self.globalFrame[name].value = value
+
 class Var:
     def __init__(self):
         self.type = None
@@ -53,3 +75,17 @@ class Var:
 
     def setType(self, typ):
         self.type = typ
+
+class Stack:
+    def __init__(self):
+        self.stack = []
+
+    def pushStack(self, typ, value):
+        self.stack.append((typ, value))
+
+    def popStack(self):
+        if(len(self.stack) <= 0):
+            sys.stderr.write("Chybajuca hodnotu v datovom zasobniku-\n")
+            sys.exit(52)
+        else:
+            return self.stack.pop()
