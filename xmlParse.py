@@ -2,6 +2,7 @@ import os
 import sys
 import xml.etree.ElementTree as ET
 import re
+from structures import *
 
 class XMLParser:
     def __init__(self, flag, source):
@@ -91,65 +92,74 @@ class XMLParser:
         # struktura XML suboru skontrolovana
 
         # kontrola syntaxi a semantiky XML
+        instructions = InstrDict()
         for instr in self.root:
             if(instr.attrib['opcode'] == 'MOVE'):
                 if(len(list(instr)) == 2):
                     self.varSyntax(instr[0])
                     self.symbSyntax(instr[1])
+                    instruction = Instruction('MOVE', instr[0], instr[1])
+                    instructions.addInstrToDict(instruction)
                 else:
                     sys.stderr.write("Instrukcia MOVE ma zly pocet parametrov\n")
                     sys.exit(32)
             elif(instr.attrib['opcode'] == 'CREATEFRAME'):
                 if(len(list(instr)) == 0):
-                    print("OK")
+                    instruction = Instruction('CREATEFRAME')
+                    instructions.addInstrToDict(instruction)
                 else:
                     sys.stderr.write("Instrukcia CREATEFRAME ma zly pocet parametrov\n")
                     sys.exit(32)
             elif(instr.attrib['opcode'] == 'PUSHFRAME'):
                 if(len(list(instr)) == 0):
-                    print("OK")
+                    instruction = Instruction('PUSHFRAME')
+                    instructions.addInstrToDict(instruction)
                 else:
                     sys.stderr.write("Instrukcia PUSHFRAME ma zly pocet parametrov\n")
                     sys.exit(32)
             elif(instr.attrib['opcode'] == 'POPFRAME'):
                 if(len(list(instr)) == 0):
-                    print("OK")
+                    instruction = Instruction('POPFRAME')
+                    instructions.addInstrToDict(instruction)
                 else:
                     sys.stderr.write("Instrukcia POPFRAME ma zly pocet parametrov\n")
                     sys.exit(32)
             elif(instr.attrib['opcode'] == 'DEFVAR'):
                 if(len(list(instr)) == 1):
                     self.varSyntax(instr[0])
+                    instruction = Instruction('DEFVAR', instr[0])
+                    instructions.addInstrToDict(instruction)
                 else:
                     sys.stderr.write("Instrukcia DEFVAR ma zly pocet parametrov\n")
                     sys.exit(32)
             elif(instr.attrib['opcode'] == 'CALL'):
                 if(len(list(instr)) == 1):
                     self.labelSyntax(instr[0])
+                    instruction = Instruction('CALL', instr[0])
+                    instructions.addInstrToDict(instruction)
                 else:
                     sys.stderr.write("Instrukcia CALL ma zly pocet parametrov\n")
                     sys.exit(32)
             elif(instr.attrib['opcode'] == 'RETURN'):
-                if(len(list(instr)) == 1):
-                    print("OK")
-                else:
-                    sys.stderr.write("Instrukcia RETURN ma zly pocet parametrov\n")
-                    sys.exit(32)
-            elif(instr.attrib['opcode'] == 'RETURN'):
-                if(len(list(instr)) == 1):
-                    print("OK")
+                if(len(list(instr)) == 0):
+                    instruction = Instruction('RETURN')
+                    instructions.addInstrToDict(instruction)
                 else:
                     sys.stderr.write("Instrukcia RETURN ma zly pocet parametrov\n")
                     sys.exit(32)
             elif(instr.attrib['opcode'] == 'PUSHS'):
                 if(len(list(instr)) == 1):
                     self.symbSyntax(instr[0])
+                    instruction = Instruction('PUSHS', instr[0])
+                    instructions.addInstrToDict(instruction)
                 else:
                     sys.stderr.write("Instrukcia PUSHS ma zly pocet parametrov\n")
                     sys.exit(32)
             elif(instr.attrib['opcode'] == 'POPS'):
                 if(len(list(instr)) == 1):
                     self.varSyntax(instr[0])
+                    instruction = Instruction('POPS', instr[0])
+                    instructions.addInstrToDict(instruction)
                 else:
                     sys.stderr.write("Instrukcia POPS ma zly pocet parametrov\n")
                     sys.exit(32)
@@ -158,6 +168,8 @@ class XMLParser:
                     self.varSyntax(instr[0])
                     self.symbSyntax(instr[1])
                     self.symbSyntax(instr[2])
+                    instruction = Instruction('ADD', instr[0], instr[1], instr[2])
+                    instructions.addInstrToDict(instruction)
                 else:
                     sys.stderr.write("Instrukcia ADD ma zly pocet parametrov\n")
                     sys.exit(32)
@@ -166,6 +178,8 @@ class XMLParser:
                     self.varSyntax(instr[0])
                     self.symbSyntax(instr[1])
                     self.symbSyntax(instr[2])
+                    instruction = Instruction('SUB', instr[0], instr[1], instr[2])
+                    instructions.addInstrToDict(instruction)
                 else:
                     sys.stderr.write("Instrukcia SUB ma zly pocet parametrov\n")
                     sys.exit(32)
@@ -174,6 +188,8 @@ class XMLParser:
                     self.varSyntax(instr[0])
                     self.symbSyntax(instr[1])
                     self.symbSyntax(instr[2])
+                    instruction = Instruction('MUL', instr[0], instr[1], instr[2])
+                    instructions.addInstrToDict(instruction)
                 else:
                     sys.stderr.write("Instrukcia MUL ma zly pocet parametrov\n")
                     sys.exit(32)
@@ -182,6 +198,8 @@ class XMLParser:
                     self.varSyntax(instr[0])
                     self.symbSyntax(instr[1])
                     self.symbSyntax(instr[2])
+                    instruction = Instruction('IDIV', instr[0], instr[1], instr[2])
+                    instructions.addInstrToDict(instruction)
                 else:
                     sys.stderr.write("Instrukcia IDIV ma zly pocet parametrov\n")
                     sys.exit(32)
@@ -190,6 +208,8 @@ class XMLParser:
                     self.varSyntax(instr[0])
                     self.symbSyntax(instr[1])
                     self.symbSyntax(instr[2])
+                    instruction = Instruction('LT', instr[0], instr[1], instr[2])
+                    instructions.addInstrToDict(instruction)
                 else:
                     sys.stderr.write("Instrukcia LT ma zly pocet parametrov\n")
                     sys.exit(32)
@@ -198,6 +218,8 @@ class XMLParser:
                     self.varSyntax(instr[0])
                     self.symbSyntax(instr[1])
                     self.symbSyntax(instr[2])
+                    instruction = Instruction('GT', instr[0], instr[1], instr[2])
+                    instructions.addInstrToDict(instruction)
                 else:
                     sys.stderr.write("Instrukcia GT ma zly pocet parametrov\n")
                     sys.exit(32)
@@ -206,6 +228,8 @@ class XMLParser:
                     self.varSyntax(instr[0])
                     self.symbSyntax(instr[1])
                     self.symbSyntax(instr[2])
+                    instruction = Instruction('EQ', instr[0], instr[1], instr[2])
+                    instructions.addInstrToDict(instruction)
                 else:
                     sys.stderr.write("Instrukcia EQ ma zly pocet parametrov\n")
                     sys.exit(32)
@@ -214,6 +238,8 @@ class XMLParser:
                     self.varSyntax(instr[0])
                     self.symbSyntax(instr[1])
                     self.symbSyntax(instr[2])
+                    instruction = Instruction('AND', instr[0], instr[1], instr[2])
+                    instructions.addInstrToDict(instruction)
                 else:
                     sys.stderr.write("Instrukcia AND ma zly pocet parametrov\n")
                     sys.exit(32)
@@ -222,6 +248,8 @@ class XMLParser:
                     self.varSyntax(instr[0])
                     self.symbSyntax(instr[1])
                     self.symbSyntax(instr[2])
+                    instruction = Instruction('OR', instr[0], instr[1], instr[2])
+                    instructions.addInstrToDict(instruction)
                 else:
                     sys.stderr.write("Instrukcia OR ma zly pocet parametrov\n")
                     sys.exit(32)
@@ -230,6 +258,8 @@ class XMLParser:
                     self.varSyntax(instr[0])
                     self.symbSyntax(instr[1])
                     self.symbSyntax(instr[2])
+                    instruction = Instruction('NOT', instr[0], instr[1], instr[2])
+                    instructions.addInstrToDict(instruction)
                 else:
                     sys.stderr.write("Instrukcia NOT ma zly pocet parametrov\n")
                     sys.exit(32)
@@ -237,6 +267,8 @@ class XMLParser:
                 if(len(list(instr)) == 2):
                     self.varSyntax(instr[0])
                     self.symbSyntax(instr[1])
+                    instruction = Instruction('INT2CHAR', instr[0], instr[1])
+                    instructions.addInstrToDict(instruction)
                 else:
                     sys.stderr.write("Instrukcia INT2CHAR ma zly pocet parametrov\n")
                     sys.exit(32)
@@ -245,6 +277,8 @@ class XMLParser:
                     self.varSyntax(instr[0])
                     self.symbSyntax(instr[1])
                     self.symbSyntax(instr[2])
+                    instruction = Instruction('STRI2INT', instr[0], instr[1], instr[2])
+                    instructions.addInstrToDict(instruction)
                 else:
                     sys.stderr.write("Instrukcia STRI2INT ma zly pocet parametrov\n")
                     sys.exit(32)
@@ -252,12 +286,16 @@ class XMLParser:
                 if(len(list(instr)) == 2):
                     self.varSyntax(instr[0])
                     self.typeSyntax(instr[1])
+                    instruction = Instruction('READ', instr[0], instr[1])
+                    instructions.addInstrToDict(instruction)
                 else:
                     sys.stderr.write("Instrukcia READ ma zly pocet parametrov\n")
                     sys.exit(32)
             elif(instr.attrib['opcode'] == 'WRITE'):
                 if(len(list(instr)) == 1):
                     self.symbSyntax(instr[0])
+                    instruction = Instruction('WRITE', instr[0])
+                    instructions.addInstrToDict(instruction)
                 else:
                     sys.stderr.write("Instrukcia WRITE ma zly pocet parametrov\n")
                     sys.exit(32)
@@ -266,6 +304,8 @@ class XMLParser:
                     self.varSyntax(instr[0])
                     self.symbSyntax(instr[1])
                     self.symbSyntax(instr[2])
+                    instruction = Instruction('CONCAT', instr[0], instr[1], instr[2])
+                    instructions.addInstrToDict(instruction)
                 else:
                     sys.stderr.write("Instrukcia CONCAT ma zly pocet parametrov\n")
                     sys.exit(32)
@@ -273,6 +313,8 @@ class XMLParser:
                 if(len(list(instr)) == 2):
                     self.varSyntax(instr[0])
                     self.symbSyntax(instr[1])
+                    instruction = Instruction('STRLEN', instr[0], instr[1])
+                    instructions.addInstrToDict(instruction)
                 else:
                     sys.stderr.write("Instrukcia STRLEN ma zly pocet parametrov\n")
                     sys.exit(32)
@@ -281,6 +323,8 @@ class XMLParser:
                     self.varSyntax(instr[0])
                     self.symbSyntax(instr[1])
                     self.symbSyntax(instr[2])
+                    instruction = Instruction('GETCHAR', instr[0], instr[1], instr[2])
+                    instructions.addInstrToDict(instruction)
                 else:
                     sys.stderr.write("Instrukcia GETCHAR ma zly pocet parametrov\n")
                     sys.exit(32)
@@ -289,6 +333,8 @@ class XMLParser:
                     self.varSyntax(instr[0])
                     self.symbSyntax(instr[1])
                     self.symbSyntax(instr[2])
+                    instruction = Instruction('SETCHAR', instr[0], instr[1], instr[2])
+                    instructions.addInstrToDict(instruction)
                 else:
                     sys.stderr.write("Instrukcia SETCHAR ma zly pocet parametrov\n")
                     sys.exit(32)
@@ -296,18 +342,29 @@ class XMLParser:
                 if(len(list(instr)) == 2):
                     self.varSyntax(instr[0])
                     self.symbSyntax(instr[1])
+                    instruction = Instruction('TYPE', instr[0], instr[1])
+                    instructions.addInstrToDict(instruction)
                 else:
                     sys.stderr.write("Instrukcia TYPE ma zly pocet parametrov\n")
                     sys.exit(32)
             elif(instr.attrib['opcode'] == 'LABEL'):
                 if(len(list(instr)) == 1):
                     self.labelSyntax(instr[0])
+                    instruction = Instruction('LABEL', instr[0])
+                    instructions.addInstrToDict(instruction)
+                    if(instr[0].text in instructions.labels):
+                        sys.stderr.write("2 labely s rovnakym menom\n")
+                        sys.exit(52)
+                    else:
+                        instructions.addLabel(instr[0].text, instr.attrib['order'])
                 else:
                     sys.stderr.write("Instrukcia LABEL ma zly pocet parametrov\n")
                     sys.exit(32)
             elif(instr.attrib['opcode'] == 'JUMP'):
                 if(len(list(instr)) == 1):
                     self.labelSyntax(instr[0])
+                    instruction = Instruction('JUMP', instr[0])
+                    instructions.addInstrToDict(instruction)
                 else:
                     sys.stderr.write("Instrukcia JUMP ma zly pocet parametrov\n")
                     sys.exit(32)
@@ -316,6 +373,8 @@ class XMLParser:
                     self.labelSyntax(instr[0])
                     self.symbSyntax(instr[1])
                     self.symbSyntax(instr[2])
+                    instruction = Instruction('JUMPIFEQ', instr[0], instr[1], instr[2])
+                    instructions.addInstrToDict(instruction)
                 else:
                     sys.stderr.write("Instrukcia JUMPIFEQ ma zly pocet parametrov\n")
                     sys.exit(32)
@@ -324,27 +383,35 @@ class XMLParser:
                     self.labelSyntax(instr[0])
                     self.symbSyntax(instr[1])
                     self.symbSyntax(instr[2])
+                    instruction = Instruction('JUMPIFNEQ', instr[0], instr[1], instr[2])
+                    instructions.addInstrToDict(instruction)
                 else:
                     sys.stderr.write("Instrukcia JUMPIFNEQ ma zly pocet parametrov\n")
                     sys.exit(32)
             elif(instr.attrib['opcode'] == 'EXIT'):
                 if(len(list(instr)) == 1):
                     self.symbSyntax(instr[0])
+                    instruction = Instruction('EXIT', instr[0])
+                    instructions.addInstrToDict(instruction)
                 else:
                     sys.stderr.write("Instrukcia EXIT ma zly pocet parametrov\n")
                     sys.exit(32)
             elif(instr.attrib['opcode'] == 'DPRINT'):
                 if(len(list(instr)) == 1):
                     self.symbSyntax(instr[0])
+                    instruction = Instruction('DPRINT', instr[0])
+                    instructions.addInstrToDict(instruction)
                 else:
                     sys.stderr.write("Instrukcia DPRINT ma zly pocet parametrov\n")
                     sys.exit(32)
             elif(instr.attrib['opcode'] == 'BREAK'):
                 if(len(list(instr)) == 0):
-                    print("OK")
+                    instruction = Instruction('BREAK')
+                    instructions.addInstrToDict(instruction)
                 else:
                     sys.stderr.write("Instrukcia BREAK ma zly pocet parametrov\n")
                     sys.exit(32)
+        return instructions
 
     def typeSyntax(self, arg):
         if(arg.attrib['type'] != 'type'):
@@ -400,11 +467,11 @@ class XMLParser:
                     sys.exit(32)
                 # prevod esc sekvencie na char
                 arg.text = re.sub(r'\\([0-9]{3})', lambda x: chr(int(x.group(1))), arg.text)
+        elif(arg.attrib['type'] == 'nil'):
+            if arg.text != 'nil':
+                sys.stderr.write("Type nil je v zlom formate\n")
+                sys.exit(32)
         else:
             sys.stderr.write("Zly type pri symbole\n")
             sys.exit(32)
-
-        
-        
-        
-        
+            
