@@ -177,6 +177,9 @@ def main():
                     variable.setTypeAndValue(instruction.arg1, 'bool', value)
                 else:
                     variable.setTypeAndValue(instruction.arg1, 'bool', 'false')
+        elif(instruction.opcode == 'MOVE'):
+            arg_type2, arg_value2 = variable.getTypeAndValue(instruction.arg2)
+            variable.setTypeAndValue(instruction.arg1, arg_type2, arg_value2)
         
         actualInstruction += 1
         
