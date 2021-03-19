@@ -254,11 +254,10 @@ class XMLParser:
                     sys.stderr.write("Instrukcia OR ma zly pocet parametrov\n")
                     sys.exit(32)
             elif(instr.attrib['opcode'] == 'NOT'):
-                if(len(list(instr)) == 3):
+                if(len(list(instr)) == 2):
                     self.varSyntax(instr[0])
                     self.symbSyntax(instr[1])
-                    self.symbSyntax(instr[2])
-                    instruction = Instruction('NOT', instr[0], instr[1], instr[2])
+                    instruction = Instruction('NOT', instr[0], instr[1])
                     instructions.addInstrToDict(instruction)
                 else:
                     sys.stderr.write("Instrukcia NOT ma zly pocet parametrov\n")

@@ -29,6 +29,12 @@ class InstrDict:
         else:
             return self.instructions[order]
 
+    def getLabelCode(self, label):
+        if label in self.labels:
+            return self.labels[label]
+        else:
+            return -1
+
 class Variables:
     def __init__(self):
         self.globalFrame = {}
