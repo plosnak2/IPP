@@ -16,9 +16,9 @@ class InstrDict:
         self.count = 0
         self.labels = {}
 
-    def addInstrToDict(self, instr):
+    def addInstrToDict(self, instr, position):
         self.count += 1
-        self.instructions[self.count] = instr
+        self.instructions[position] = instr
     
     def addLabel(self, label, order):
         self.labels[label] = order
