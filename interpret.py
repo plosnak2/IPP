@@ -17,12 +17,21 @@ def main():
     if(len(instructions.instructions) == 0):
         sys.exit(0)
 
+    if(argChecker.inputFlag == True):
+        try:
+            fileInput = open(argChecker.input, 'r')
+        except:
+            sys.stderr.write("Nepodarilo sa otvorit subor\n")
+            sys.exit(11)
+
     # v zozname je aspon jedna instrukcia -> ideme v cykle
     variable = Variables()
     stack = Stack()
     callReturnStack = CallReturnStack()
     actualInstruction = 1
+    doneInstructions = 0
     while True:
+        doneInstructions += 1
         instruction = instructions.getNextInstr(actualInstruction)
         if(instruction is None):
             break
@@ -39,6 +48,9 @@ def main():
                 print(arg_value, end='')
         elif(instruction.opcode == 'PUSHS'):
             arg_type, arg_value = variable.getTypeAndValue(instruction.arg1)
+            if(arg_type is None):
+                sys.stderr.write("Chybajuca hodnota v premennej\n")
+                sys.exit(56)
             stack.pushStack(arg_type,arg_value)
         elif(instruction.opcode == 'POPS'):
             arg_type, arg_value = stack.popStack()
@@ -46,6 +58,9 @@ def main():
         elif(instruction.opcode == 'ADD'):
             arg_type2, arg_value2 = variable.getTypeAndValue(instruction.arg2)
             arg_type3, arg_value3 = variable.getTypeAndValue(instruction.arg3)
+            if(arg_type2 is None or arg_type3 is None):
+                sys.stderr.write("Chybajuca hodnota v premennej\n")
+                sys.exit(56)
             if arg_type2 == arg_type3:
                 if arg_type2 == 'int':
                     value = int(arg_value2) + int(arg_value3)
@@ -59,6 +74,9 @@ def main():
         elif(instruction.opcode == 'SUB'):
             arg_type2, arg_value2 = variable.getTypeAndValue(instruction.arg2)
             arg_type3, arg_value3 = variable.getTypeAndValue(instruction.arg3)
+            if(arg_type2 is None or arg_type3 is None):
+                sys.stderr.write("Chybajuca hodnota v premennej\n")
+                sys.exit(56)
             if arg_type2 == arg_type3:
                 if arg_type2 == 'int':
                     value = int(arg_value2) - int(arg_value3)
@@ -72,6 +90,9 @@ def main():
         elif(instruction.opcode == 'MUL'):
             arg_type2, arg_value2 = variable.getTypeAndValue(instruction.arg2)
             arg_type3, arg_value3 = variable.getTypeAndValue(instruction.arg3)
+            if(arg_type2 is None or arg_type3 is None):
+                sys.stderr.write("Chybajuca hodnota v premennej\n")
+                sys.exit(56)
             if arg_type2 == arg_type3:
                 if arg_type2 == 'int':
                     value = int(arg_value2) * int(arg_value3)
@@ -85,6 +106,9 @@ def main():
         elif(instruction.opcode == 'IDIV'):
             arg_type2, arg_value2 = variable.getTypeAndValue(instruction.arg2)
             arg_type3, arg_value3 = variable.getTypeAndValue(instruction.arg3)
+            if(arg_type2 is None or arg_type3 is None):
+                sys.stderr.write("Chybajuca hodnota v premennej\n")
+                sys.exit(56)
             if arg_type2 == arg_type3:
                 if arg_type2 == 'int':
                     if(int(arg_value3) == 0):
@@ -102,6 +126,9 @@ def main():
         elif(instruction.opcode == 'LT'):
             arg_type2, arg_value2 = variable.getTypeAndValue(instruction.arg2)
             arg_type3, arg_value3 = variable.getTypeAndValue(instruction.arg3)
+            if(arg_type2 is None or arg_type3 is None):
+                sys.stderr.write("Chybajuca hodnota v premennej\n")
+                sys.exit(56)
             if(arg_type2 != arg_type3):
                 sys.stderr.write("Zly typ operandov pri instrukci LT - operandy musia mat rovnake typy\n")
                 sys.exit(53)
@@ -130,6 +157,9 @@ def main():
         elif(instruction.opcode == 'GT'):
             arg_type2, arg_value2 = variable.getTypeAndValue(instruction.arg2)
             arg_type3, arg_value3 = variable.getTypeAndValue(instruction.arg3)
+            if(arg_type2 is None or arg_type3 is None):
+                sys.stderr.write("Chybajuca hodnota v premennej\n")
+                sys.exit(56)
             if(arg_type2 != arg_type3):
                 sys.stderr.write("Zly typ operandov pri instrukci GT - operandy musia mat rovnake typy\n")
                 sys.exit(53)
@@ -158,6 +188,9 @@ def main():
         elif(instruction.opcode == 'EQ'):
             arg_type2, arg_value2 = variable.getTypeAndValue(instruction.arg2)
             arg_type3, arg_value3 = variable.getTypeAndValue(instruction.arg3)
+            if(arg_type2 is None or arg_type3 is None):
+                sys.stderr.write("Chybajuca hodnota v premennej\n")
+                sys.exit(56)
             if(arg_type2 != 'nil' and arg_type3 != 'nil'):
                 if(arg_type2 != arg_type3):
                     sys.stderr.write("Zly typ operandov pri instrukci EQ - operandy musia mat rovnake typy\n")
@@ -181,10 +214,15 @@ def main():
         elif(instruction.opcode == 'MOVE'):
             arg_type2, arg_value2 = variable.getTypeAndValue(instruction.arg2)
             variable.setTypeAndValue(instruction.arg1, arg_type2, arg_value2)
-            # mozem movnut neinicializovanu premennu do inej ? 
+            if(arg_type2 is None):
+                sys.stderr.write("Chybajuca hodnota v premennej\n")
+                sys.exit(56) 
         elif(instruction.opcode == 'AND'):
             arg_type2, arg_value2 = variable.getTypeAndValue(instruction.arg2)
             arg_type3, arg_value3 = variable.getTypeAndValue(instruction.arg3)
+            if(arg_type2 is None or arg_type3 is None):
+                sys.stderr.write("Chybajuca hodnota v premennej\n")
+                sys.exit(56)
             if(arg_type2 != arg_type3):
                 sys.stderr.write("Zly typ operandov pri instrukci AND - operandy musia mat rovnake typy\n")
                 sys.exit(53)
@@ -201,6 +239,9 @@ def main():
         elif(instruction.opcode == 'OR'):
             arg_type2, arg_value2 = variable.getTypeAndValue(instruction.arg2)
             arg_type3, arg_value3 = variable.getTypeAndValue(instruction.arg3)
+            if(arg_type2 is None or arg_type3 is None):
+                sys.stderr.write("Chybajuca hodnota v premennej\n")
+                sys.exit(56)
             if(arg_type2 != arg_type3):
                 sys.stderr.write("Zly typ operandov pri instrukci OR - operandy musia mat rovnake typy\n")
                 sys.exit(53)
@@ -216,6 +257,9 @@ def main():
                     variable.setTypeAndValue(instruction.arg1, 'bool', value)
         elif(instruction.opcode == 'NOT'):
             arg_type2, arg_value2 = variable.getTypeAndValue(instruction.arg2)
+            if(arg_type2 is None):
+                sys.stderr.write("Chybajuca hodnota v premennej\n")
+                sys.exit(56)
             if(arg_type2 != 'bool'):
                 sys.stderr.write("Zly typ operandu pri instrukci NOT - operand musi byt typu bool\n")
                 sys.exit(53)
@@ -227,6 +271,9 @@ def main():
                 variable.setTypeAndValue(instruction.arg1, 'bool', value)
         elif(instruction.opcode == 'INT2CHAR'):
             arg_type2, arg_value2 = variable.getTypeAndValue(instruction.arg2)
+            if(arg_type2 is None):
+                sys.stderr.write("Chybajuca hodnota v premennej\n")
+                sys.exit(56)
             if(arg_type2 != 'int'):
                 sys.stderr.write("Zly typ operandu pri instrukci INT2CHAR - operand musi byt typu int\n")
                 sys.exit(53)
@@ -240,7 +287,13 @@ def main():
         elif(instruction.opcode == 'STRI2INT'):
             arg_type2, arg_value2 = variable.getTypeAndValue(instruction.arg2)
             arg_type3, arg_value3 = variable.getTypeAndValue(instruction.arg3)
+            if(arg_type2 is None or arg_type3 is None):
+                sys.stderr.write("Chybajuca hodnota v premennej\n")
+                sys.exit(56)
             if(arg_type2 == 'string' and arg_type3 == 'int'):
+                if(int(arg_value3) < 0):
+                    sys.stderr.write("Indexacia mimo retazec pri instrukci STRI2INT\n")
+                    sys.exit(58)
                 try:
                     value = arg_value2[int(arg_value3)]
                     value = ord(value)
@@ -254,6 +307,9 @@ def main():
         elif(instruction.opcode == 'CONCAT'):
             arg_type2, arg_value2 = variable.getTypeAndValue(instruction.arg2)
             arg_type3, arg_value3 = variable.getTypeAndValue(instruction.arg3)
+            if(arg_type2 is None or arg_type3 is None):
+                sys.stderr.write("Chybajuca hodnota v premennej\n")
+                sys.exit(56)
             if(arg_type2 != arg_type3):
                 sys.stderr.write("Zly typ operandov pri instrukci CONCAT - operandy musia byt typu string\n")
                 sys.exit(53)
@@ -266,6 +322,9 @@ def main():
                     variable.setTypeAndValue(instruction.arg1, 'string', value)
         elif(instruction.opcode == 'STRLEN'):
             arg_type2, arg_value2 = variable.getTypeAndValue(instruction.arg2)
+            if(arg_type2 is None):
+                sys.stderr.write("Chybajuca hodnota v premennej\n")
+                sys.exit(56)
             if(arg_type2 != 'string'):
                 sys.stderr.write("Zly typ operandu pri instrukci STRLEN - operand musi byt typu string\n")
                 sys.exit(53)
@@ -275,7 +334,13 @@ def main():
         elif(instruction.opcode == 'GETCHAR'):
             arg_type2, arg_value2 = variable.getTypeAndValue(instruction.arg2)
             arg_type3, arg_value3 = variable.getTypeAndValue(instruction.arg3)
+            if(arg_type2 is None or arg_type3 is None):
+                sys.stderr.write("Chybajuca hodnota v premennej\n")
+                sys.exit(56)
             if(arg_type2 == 'string' and arg_type3 == 'int'):
+                if(int(arg_value3) < 0):
+                    sys.stderr.write("Indexacia mimo retazec pri instrukci STRI2INT\n")
+                    sys.exit(58)
                 try:
                     value = arg_value2[int(arg_value3)]
                 except:
@@ -289,7 +354,13 @@ def main():
             arg_type1, arg_value1 = variable.getTypeAndValue(instruction.arg1)
             arg_type2, arg_value2 = variable.getTypeAndValue(instruction.arg2)
             arg_type3, arg_value3 = variable.getTypeAndValue(instruction.arg3)
+            if(arg_type2 is None or arg_type3 is None or arg_type1 is None):
+                sys.stderr.write("Chybajuca hodnota v premennej\n")
+                sys.exit(56)
             if(arg_type1 == 'string' and arg_type2 == 'int' and arg_type3 == 'string'):
+                if(int(arg_value2) < 0):
+                    sys.stderr.write("Indexacia mimo retazec pri instrukci STRI2INT\n")
+                    sys.exit(58)
                 try:
                     arg_value1 = list(arg_value1)
                     arg_value1[int(arg_value2)] = arg_value3[0]
@@ -313,6 +384,9 @@ def main():
             print(arg_value1, end='',file=sys.stderr)
         elif(instruction.opcode == 'EXIT'):
             arg_type1, arg_value1 = variable.getTypeAndValue(instruction.arg1)
+            if(arg_type1 is None):
+                sys.stderr.write("Chybajuca hodnota v premennej\n")
+                sys.exit(56)
             if(arg_type1 != 'int'):
                 sys.stderr.write("Zly typ operandu pri instrukci EXIT - operandy musi byt typu int.\n")
                 sys.exit(53)
@@ -338,15 +412,16 @@ def main():
             arg_type1, arg_value1 = variable.getTypeAndValue(instruction.arg1)
             arg_type2, arg_value2 = variable.getTypeAndValue(instruction.arg2)
             arg_type3, arg_value3 = variable.getTypeAndValue(instruction.arg3)
-            # malo by zahrnovat aj nil porovanie
+            if(arg_type2 is None or arg_type3 is None):
+                sys.stderr.write("Chybajuca hodnota v premennej\n")
+                sys.exit(56)
+            number = instructions.getLabelCode(arg_value1)
+            if(int(number) == -1):
+                sys.stderr.write("JUMP na nedefinovany label\n")
+                sys.exit(52)
             if(arg_type2 == arg_type3):
                 if(str(arg_value2) == str(arg_value3)):
-                    number = instructions.getLabelCode(arg_value1)
-                    if(int(number) == -1):
-                        sys.stderr.write("JUMP na nedefinovany label\n")
-                        sys.exit(52)
-                    else:
-                        actualInstruction = int(number)
+                    actualInstruction = int(number)
                 else:
                     pass
             elif(arg_type2 == 'nil' or arg_type3 == 'nil'):
@@ -358,15 +433,18 @@ def main():
             arg_type1, arg_value1 = variable.getTypeAndValue(instruction.arg1)
             arg_type2, arg_value2 = variable.getTypeAndValue(instruction.arg2)
             arg_type3, arg_value3 = variable.getTypeAndValue(instruction.arg3)
+            if(arg_type2 is None or arg_type3 is None):
+                sys.stderr.write("Chybajuca hodnota v premennej\n")
+                sys.exit(56)
+
+            number = instructions.getLabelCode(arg_value1)
+            if(int(number) == -1):
+                sys.stderr.write("JUMP na nedefinovany label\n")
+                sys.exit(52)
             # malo by zahrnovat aj nil porovanie
             if(arg_type2 == arg_type3):
                 if(str(arg_value2) != str(arg_value3)):
-                    number = instructions.getLabelCode(arg_value1)
-                    if(int(number) == -1):
-                        sys.stderr.write("JUMP na nedefinovany label\n")
-                        sys.exit(52)
-                    else:
-                        actualInstruction = int(number)
+                    actualInstruction = int(number)
                 else:
                     pass
             elif(arg_type2 == 'nil' or arg_type3 == 'nil'):
@@ -398,6 +476,66 @@ def main():
             variable.pushTF()
         elif(instruction.opcode == 'POPFRAME'):
             variable.popTF()
+        elif(instruction.opcode == 'READ'):
+            arg_type2, arg_value2 = variable.getTypeAndValue(instruction.arg2)
+            
+            if(argChecker.inputFlag == False):
+                try:
+                    value = input()
+                except:
+                    value = 'nil'
+                    variable.setTypeAndValue(instruction.arg1, 'nil', 'nil')
+                
+                if(value != 'nil'):
+                    if(arg_value2 == 'int'):
+                        try:
+                            value = int(value)
+                            variable.setTypeAndValue(instruction.arg1, 'int', value)
+                        except:
+                            variable.setTypeAndValue(instruction.arg1, 'nil', 'nil')
+                    elif(arg_value2 == 'bool'):
+                        if('true' == value.lower()):
+                            value = 'true'
+                        else:
+                            value = 'false'
+                        variable.setTypeAndValue(instruction.arg1, 'bool', value)
+                    elif(arg_value2 == 'nil'):
+                        variable.setTypeAndValue(instruction.arg1, 'nil', 'nil')
+                    else:
+                        variable.setTypeAndValue(instruction.arg1, 'string', value)
+            else:
+                value = fileInput.readline()
+                if not value:
+                    value = 'nil'
+                    variable.setTypeAndValue(instruction.arg1, 'nil', 'nil')
+                
+                if(value != 'nil'):
+                    if(arg_value2 == 'int'):
+                        try:
+                            value = int(value)
+                            variable.setTypeAndValue(instruction.arg1, 'int', value)
+                        except:
+                            variable.setTypeAndValue(instruction.arg1, 'nil', 'nil')
+                        
+                    elif(arg_value2 == 'bool'):
+                        value = value[0:len(value)-1]
+                        if('true' == value.lower()):
+                            value = 'true'
+                        else:
+                            value = 'false'
+                        variable.setTypeAndValue(instruction.arg1, 'bool', value)
+                    elif(arg_value2 == 'nil'):
+                        variable.setTypeAndValue(instruction.arg1, 'nil', 'nil')
+                    else:
+                        value = value[0:len(value)-1]
+                        variable.setTypeAndValue(instruction.arg1, 'string', value)
+                    
+        elif(instruction.opcode == 'BREAK'):
+            print("Obsah globalneho ramca: {}\nPocet instrukci v globalnom ramci: {}\nDostupnost docasneho ramca: {}\nPocet vykonanych instrukci: {}\n".format(variable.globalFrame, len(variable.globalFrame), variable.accesible, doneInstructions), end='',file=sys.stderr)
+
+            if(variable.accesible):
+                print("Obsah docasneho ramca: {}\n".format(variable.temporaryFrame), end='', file=sys.stderr)
+            
         actualInstruction += 1
         
         

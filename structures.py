@@ -81,7 +81,7 @@ class Variables:
             if(frame == 'GF'):
                 if name not in self.globalFrame:
                     sys.stderr.write("Pristup k neexistujucej premennej: {}\n".format(name))
-                    sys.exit(52)
+                    sys.exit(54)
                 else:
                     return(self.globalFrame[name].type, self.globalFrame[name].value)
             elif(frame == 'LF'):
