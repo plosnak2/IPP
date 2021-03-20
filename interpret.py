@@ -518,7 +518,8 @@ def main():
                             variable.setTypeAndValue(instruction.arg1, 'nil', 'nil')
                         
                     elif(arg_value2 == 'bool'):
-                        value = value[0:len(value)-1]
+                        if(value[len(value)-1] == '\n'):
+                            value = value[0:len(value)-1]
                         if('true' == value.lower()):
                             value = 'true'
                         else:
