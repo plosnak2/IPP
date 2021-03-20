@@ -92,6 +92,20 @@ class Stack:
     def popStack(self):
         if(len(self.stack) <= 0):
             sys.stderr.write("Chybajuca hodnotu v datovom zasobniku-\n")
-            sys.exit(52)
+            sys.exit(56)
+        else:
+            return self.stack.pop()
+
+class CallReturnStack:
+    def __init__(self):
+        self.stack = []
+
+    def pushStack(self, value):
+        self.stack.append(value)
+
+    def popStack(self):
+        if(len(self.stack) <= 0):
+            sys.stderr.write("Chybajuca hodnotu v datovom zasobniku-\n")
+            sys.exit(56)
         else:
             return self.stack.pop()

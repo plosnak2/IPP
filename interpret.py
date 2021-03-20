@@ -20,6 +20,7 @@ def main():
     # v zozname je aspon jedna instrukcia -> ideme v cykle
     variable = Variables()
     stack = Stack()
+    callReturnStack = CallReturnStack()
     actualInstruction = 1
     while True:
         instruction = instructions.getNextInstr(actualInstruction)
@@ -321,7 +322,7 @@ def main():
                     sys.exit(value)
                 else:
                     sys.stderr.write("EXIT musi byt celociselna hodnota medzi 0 a 49.\n")
-                    sys.exit(53)
+                    sys.exit(57)
         elif(instruction.opcode == 'LABEL'):
             actualInstruction += 1
             continue
@@ -332,9 +333,56 @@ def main():
                 sys.stderr.write("JUMP na nedefinovany label\n")
                 sys.exit(52)
             else:
-                print(number)
                 actualInstruction = int(number)
-
+        elif(instruction.opcode == 'JUMPIFEQ'):
+            arg_type1, arg_value1 = variable.getTypeAndValue(instruction.arg1)
+            arg_type2, arg_value2 = variable.getTypeAndValue(instruction.arg2)
+            arg_type3, arg_value3 = variable.getTypeAndValue(instruction.arg3)
+            # malo by zahrnovat aj nil porovanie
+            if(arg_type2 == arg_type3):
+                if(arg_value2 == arg_value3):
+                    number = instructions.getLabelCode(arg_value1)
+                    if(int(number) == -1):
+                        sys.stderr.write("JUMP na nedefinovany label\n")
+                        sys.exit(52)
+                    else:
+                        actualInstruction = int(number)
+                else:
+                    pass
+            else:
+                sys.stderr.write("Zly typ operandov pri instrukci JUMPIFEQ - operandy musia byt rovnakeho typu.\n")
+                sys.exit(53)
+        elif(instruction.opcode == 'JUMPIFNEQ'):
+            arg_type1, arg_value1 = variable.getTypeAndValue(instruction.arg1)
+            arg_type2, arg_value2 = variable.getTypeAndValue(instruction.arg2)
+            arg_type3, arg_value3 = variable.getTypeAndValue(instruction.arg3)
+            # malo by zahrnovat aj nil porovanie
+            if(arg_type2 == arg_type3):
+                if(arg_value2 != arg_value3):
+                    number = instructions.getLabelCode(arg_value1)
+                    if(int(number) == -1):
+                        sys.stderr.write("JUMP na nedefinovany label\n")
+                        sys.exit(52)
+                    else:
+                        actualInstruction = int(number)
+                else:
+                    pass
+            else:
+                sys.stderr.write("Zly typ operandov pri instrukci JUMPIFEQ - operandy musia byt rovnakeho typu.\n")
+                sys.exit(53)
+        elif(instruction.opcode == 'CALL'):
+            arg_type1, arg_value1 = variable.getTypeAndValue(instruction.arg1)
+            callReturnStack.pushStack(actualInstruction + 1)
+            
+            number = instructions.getLabelCode(arg_value1)
+            if(int(number) == -1):
+                sys.stderr.write("CALL na nedefinovany label\n")
+                sys.exit(52)
+            else:
+                actualInstruction = int(number)
+        elif(instruction.opcode == 'RETURN'):
+            actualInstruction = callReturnStack.popStack()
+            continue
 
         actualInstruction += 1
         
