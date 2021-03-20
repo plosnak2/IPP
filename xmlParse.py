@@ -56,7 +56,19 @@ class XMLParser:
             if 'opcode' not in instr.attrib:
                 sys.stderr.write("Element instrukcie nema atribut opcode\n")
                 sys.exit(32)
-            order = int(instr.attrib['order'])
+
+            try:
+                order = int(instr.attrib['order'])
+            except:
+                sys.stderr.write("Order musi byt číslo\n")
+                sys.exit(32)
+            if(order in instr_order):
+                sys.stderr.write("Duplicitny order pri instrukci\n")
+                sys.exit(32)
+            if(order < 0):
+                sys.stderr.write("Negativny order pri instrukci\n")
+                sys.exit(32)
+            
             instr_order.append(order)
 
             arg_order = 1
@@ -83,12 +95,15 @@ class XMLParser:
                 arg_order += 1
 
         # kontrola orderu jednotlivych instrukci -> ordery instrukci musia ist vzostupne od 1
+        """
         check = 1
         for i in instr_order:
             if(i != check):
                 sys.stderr.write("Zle poradie orderov pri elementoch instrukci\n")
                 sys.exit(32)
             check += 1
+        """
+        
         # struktura XML suboru skontrolovana
 
         # kontrola syntaxi a semantiky XML
@@ -410,6 +425,9 @@ class XMLParser:
                 else:
                     sys.stderr.write("Instrukcia BREAK ma zly pocet parametrov\n")
                     sys.exit(32)
+            else:
+                sys.stderr.write("Nevalidna instrukcia\n")
+                sys.exit(32)
         return instructions
 
     def typeSyntax(self, arg):
