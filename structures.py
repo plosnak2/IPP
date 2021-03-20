@@ -38,6 +38,9 @@ class InstrDict:
 class Variables:
     def __init__(self):
         self.globalFrame = {}
+        self.stack = []
+        self.temporaryFrame = {}
+        self.accesible = False
 
     def defvar(self, variable):
         frame, name = variable.text.split('@', 1)
@@ -48,6 +51,29 @@ class Variables:
             else:
                 variable = Var()
                 self.globalFrame[name] = variable
+        elif(frame == 'LF'):
+            if(len(self.stack) <= 0):
+                sys.stderr.write("Vytvorenie premenej na nedefinovanom ramci.\n")
+                sys.exit(55)
+            else:
+                if(name in self.stack[len(self.stack) - 1]):
+                    sys.stderr.write("Redefinicia premennej s nazvom: {}\n".format(name))
+                    sys.exit(52)
+                else:
+                    variable = Var()
+                    frame = self.stack[len(self.stack) - 1]
+                    frame[name] = variable
+        else:
+            if self.accesible == False:
+                sys.stderr.write("Vytvorenie premenej na nedefinovanom ramci.\n")
+                sys.exit(55)
+            else:
+                if(name in self.temporaryFrame):
+                    sys.stderr.write("Redefinicia premennej s nazvom: {}\n".format(name))
+                    sys.exit(52)
+                else:
+                    variable = Var()
+                    self.temporaryFrame[name] = variable
 
     def getTypeAndValue(self, arg):
         if(arg.attrib['type'] == 'var'):
@@ -58,6 +84,27 @@ class Variables:
                     sys.exit(52)
                 else:
                     return(self.globalFrame[name].type, self.globalFrame[name].value)
+            elif(frame == 'LF'):
+                if(len(self.stack) <= 0):
+                    sys.stderr.write("Neexistujuci ramec.\n")
+                    sys.exit(55)
+                else:
+                    if(name not in self.stack[len(self.stack) - 1]):
+                        sys.stderr.write("Pristup k neexistujucej premennej: {}\n".format(name))
+                        sys.exit(54)
+                    else:
+                        frame = self.stack[len(self.stack) - 1]
+                        return(frame[name].type, frame[name].value)
+            else:
+                if self.accesible == False:
+                    sys.stderr.write("Vytvorenie premenej na nedefinovanom ramci.\n")
+                    sys.exit(55)
+                else:
+                    if(name not in self.temporaryFrame):
+                        sys.stderr.write("Pristup k neexistujucej premennej: {}\n".format(name))
+                        sys.exit(54)
+                    else:
+                        return(self.temporaryFrame[name].type, self.temporaryFrame[name].value)
         else:
             return(arg.attrib['type'], arg.text)
 
@@ -66,10 +113,54 @@ class Variables:
         if(frame == 'GF'):
             if name not in self.globalFrame:
                 sys.stderr.write("Pristup k neexistujucej premennej: {}\n".format(name))
-                sys.exit(52)
+                sys.exit(54)
             else:
                 self.globalFrame[name].type = typ
                 self.globalFrame[name].value = value
+        elif(frame == 'LF'):
+            if(len(self.stack) <= 0):
+                sys.stderr.write("Neexistujuci ramec.\n")
+                sys.exit(55)
+            else:
+                if(name not in self.stack[len(self.stack) - 1]):
+                    sys.stderr.write("Pristup k neexistujucej premennej: {}\n".format(name))
+                    sys.exit(54)
+                else:
+                    frame = self.stack[len(self.stack) - 1]
+                    frame[name].type = typ
+                    frame[name].value = value
+        else:
+            if self.accesible == False:
+                sys.stderr.write("Vytvorenie premenej na nedefinovanom ramci.\n")
+                sys.exit(55)
+            else:
+                if(name not in self.temporaryFrame):
+                    sys.stderr.write("Pristup k neexistujucej premennej: {}\n".format(name))
+                    sys.exit(54)
+                else:
+                    self.temporaryFrame[name].type = typ
+                    self.temporaryFrame[name].value = value
+                    
+    
+    def createTF(self):
+        self.temporaryFrame = {}
+        self.accesible = True
+    
+    def pushTF(self):
+        if(self.accesible == False):
+            sys.stderr.write("Pristup k nedefinovanemu ramcu.\n")
+            sys.exit(55)
+        else:
+            self.stack.append(self.temporaryFrame)
+            self.accesible = False
+    
+    def popTF(self):
+        if(len(self.stack) <= 0):
+            sys.stderr.write("Ziadny ramec v LF neni k dispozici.\n")
+            sys.exit(55)
+        else:
+            self.temporaryFrame = self.stack.pop()
+            self.accesible = True
 
 class Var:
     def __init__(self):

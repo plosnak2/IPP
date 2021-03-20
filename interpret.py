@@ -34,9 +34,9 @@ def main():
                 sys.stderr.write("Pokus o vypis obsahu premennej bez hodnoty: {}\n".format(instruction.arg1.text))
                 sys.exit(56)
             elif(arg_type == 'nil'):
-                print('')
+                print('', end='')
             else:
-                print(arg_value)
+                print(arg_value, end='')
         elif(instruction.opcode == 'PUSHS'):
             arg_type, arg_value = variable.getTypeAndValue(instruction.arg1)
             stack.pushStack(arg_type,arg_value)
@@ -310,7 +310,7 @@ def main():
             variable.setTypeAndValue(instruction.arg1, 'string', value)
         elif(instruction.opcode == 'DPRINT'):
             arg_type1, arg_value1 = variable.getTypeAndValue(instruction.arg1)
-            print(arg_value1, file=sys.stderr)
+            print(arg_value1, end='',file=sys.stderr)
         elif(instruction.opcode == 'EXIT'):
             arg_type1, arg_value1 = variable.getTypeAndValue(instruction.arg1)
             if(arg_type1 != 'int'):
@@ -340,7 +340,7 @@ def main():
             arg_type3, arg_value3 = variable.getTypeAndValue(instruction.arg3)
             # malo by zahrnovat aj nil porovanie
             if(arg_type2 == arg_type3):
-                if(arg_value2 == arg_value3):
+                if(str(arg_value2) == str(arg_value3)):
                     number = instructions.getLabelCode(arg_value1)
                     if(int(number) == -1):
                         sys.stderr.write("JUMP na nedefinovany label\n")
@@ -349,6 +349,8 @@ def main():
                         actualInstruction = int(number)
                 else:
                     pass
+            elif(arg_type2 == 'nil' or arg_type3 == 'nil'):
+                pass
             else:
                 sys.stderr.write("Zly typ operandov pri instrukci JUMPIFEQ - operandy musia byt rovnakeho typu.\n")
                 sys.exit(53)
@@ -358,7 +360,7 @@ def main():
             arg_type3, arg_value3 = variable.getTypeAndValue(instruction.arg3)
             # malo by zahrnovat aj nil porovanie
             if(arg_type2 == arg_type3):
-                if(arg_value2 != arg_value3):
+                if(str(arg_value2) != str(arg_value3)):
                     number = instructions.getLabelCode(arg_value1)
                     if(int(number) == -1):
                         sys.stderr.write("JUMP na nedefinovany label\n")
@@ -367,8 +369,15 @@ def main():
                         actualInstruction = int(number)
                 else:
                     pass
+            elif(arg_type2 == 'nil' or arg_type3 == 'nil'):
+                number = instructions.getLabelCode(arg_value1)
+                if(int(number) == -1):
+                    sys.stderr.write("JUMP na nedefinovany label\n")
+                    sys.exit(52)
+                else:
+                    actualInstruction = int(number)
             else:
-                sys.stderr.write("Zly typ operandov pri instrukci JUMPIFEQ - operandy musia byt rovnakeho typu.\n")
+                sys.stderr.write("Zly typ operandov pri instrukci JUMPIFNEQ - operandy musia byt rovnakeho typu.\n")
                 sys.exit(53)
         elif(instruction.opcode == 'CALL'):
             arg_type1, arg_value1 = variable.getTypeAndValue(instruction.arg1)
@@ -383,7 +392,12 @@ def main():
         elif(instruction.opcode == 'RETURN'):
             actualInstruction = callReturnStack.popStack()
             continue
-
+        elif(instruction.opcode == 'CREATEFRAME'):
+            variable.createTF()
+        elif(instruction.opcode == 'PUSHFRAME'):
+            variable.pushTF()
+        elif(instruction.opcode == 'POPFRAME'):
+            variable.popTF()
         actualInstruction += 1
         
         
