@@ -5,6 +5,7 @@ import re
 from structures import *
 
 class XMLParser:
+    """Objekt ktory sa stara o spracovanie celeho XML"""
     def __init__(self, flag, source):
         self.flag = flag
         if(self.flag):
@@ -14,7 +15,7 @@ class XMLParser:
 
     
     def xmlParse(self):
-        """Funkcia na kontrolu zakladnej struktury XML"""
+        """Funkcia na kontrolu zakladnej struktury XML a syntaktickych a lexikalnych chyb v XML"""
         try:
             tree = ET.parse(self.source)
             self.root = tree.getroot()
@@ -433,6 +434,7 @@ class XMLParser:
         return instructions
 
     def typeSyntax(self, arg):
+        """Funkcia na skontrolovanie spravnosti typu (podobne ako v parseri)"""
         if(arg.attrib['type'] != 'type'):
             sys.stderr.write("Element arg ma zly type - musi byt type\n")
             sys.exit(32)
@@ -442,6 +444,7 @@ class XMLParser:
                 sys.exit(32)
 
     def labelSyntax(self, arg):
+        """Funkcia na skontrolovanie spravnosti labelu (podobne ako v parseri)"""
         if(arg.attrib['type'] != 'label'):
             sys.stderr.write("Element arg ma zly type - musi byt label\n")
             sys.exit(32)
@@ -451,6 +454,7 @@ class XMLParser:
                 sys.exit(32)
 
     def varSyntax(self,arg):
+        """Funkcia na skontrolovanie spravnosti var (podobne ako v parseri)"""
         if(arg.attrib['type'] != 'var'):
             sys.stderr.write("Element arg ma zly type - musi byt var\n")
             sys.exit(32)
@@ -467,6 +471,7 @@ class XMLParser:
                 sys.exit(32)
 
     def symbSyntax(self, arg):
+        """Funkcia na skontrolovanie spravnosti symbolu (podobne ako v parseri)"""
         if(arg.attrib['type'] == 'var'):
             self.varSyntax(arg)
         elif(arg.attrib['type'] == 'bool'):

@@ -1,6 +1,7 @@
 import sys
 
 class Arguments:
+    """Objekt ktory sa stara o kontrolu parametrov skriptu"""
     def __init__(self):
         self.source = ''
         self.input = ''
@@ -8,7 +9,7 @@ class Arguments:
         self.inputFlag = False
 
     def argCheck(self):
-        """Kontrola parametrov"""
+        """Metóda pre kontrolu parametrov"""
         if("--help" in sys.argv):
             if(len(sys.argv) == 2):
                 self.printHelp()
@@ -48,7 +49,7 @@ class Arguments:
 
 
     def printHelp(self):
-        """Funkcia pre vypis napovedy a ukoncenie programu"""
+        """Metoda pre vypis napovedy a ukoncenie programu"""
         print("Interpret pre IPPcode21 pisany v pythone.\nSkript je spustitelný s nasledujucimi parametrami:\n--help : pre výpis napovedy\n--input=file : subor so vstupmi pre samotnu interpretaciu zadaneho zdrojoveho kodu\n--source=file : vstupný subor s XML reprezentaciou zdrojoveho kodu\nSkript musi byt spusteny aspon s jednym z poslednych dvoch spominanych parametrov.")
         sys.exit(0)
 
